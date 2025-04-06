@@ -2,29 +2,39 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SearchBar.css';
 
-export default function SearchBar() {
+export default function SearchBar({ value, onChange, onSubmit }) {
 
-    const [query, setQuery] = useState('');
+    const [internalQuery, setInternalQuery] = useState('');
     const navigate = useNavigate();
 
+    const isControlled = typeof value !== 'undefined';
+
+    const handleInputChange = (event) => {
+        // Check if the component is controlled or uncontrolled
+        // If controlled, use the value from props; otherwise, use internal state
+        const newValue = event.target.value;
+        if (isControlled) {
+            onChange(newValue);
+        } else {
+            setInternalQuery(newValue);
+        }
+    };
+
     const handleSubmit = (event) => {
-
         event.preventDefault();
-        const searchValue = query.trim();
 
-        if (searchValue === "") {
+        const searchValue = (isControlled ? value : internalQuery).trim();
+        if (!searchValue) {
             alert("Please enter a search term.");
             return;
         }
 
-        // Sanitize the query before using in URL
-        navigate(`/search?query=${encodeURIComponent(searchValue)}`);
+        if (onSubmit) {
+            onSubmit(searchValue);
+        } else { // Default behavior: navigate to search results page
+            navigate(`/search?query=${encodeURIComponent(searchValue)}`);
+        }
     };
-
-    const handleInputChange = (event) => {
-        setQuery(event.target.value);
-    };
-
 
     return (
         <form onSubmit={handleSubmit}>
@@ -32,10 +42,10 @@ export default function SearchBar() {
                 <input
                     id="text-input"
                     type="text"
-                    value={query}
+                    value={isControlled ? value : internalQuery}
                     onChange={handleInputChange}
-                    enterkeyhint="search"
-                    autocapitalize="off"
+                    enterKeyHint="search"
+                    autoCapitalize="off"
                     placeholder="Search"
                 />
                 <button id="go-button" type="submit">GO</button>

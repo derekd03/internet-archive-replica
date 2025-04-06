@@ -59,6 +59,7 @@ const Upload = () => {
         }
     };
 
+    // Drag-and-drop handlers
     const handleDragEnter = useCallback((e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -87,12 +88,15 @@ const Upload = () => {
         }
     }, []);
 
+    // Handle file input change
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
             setFile(e.target.files[0]);
         }
     };
 
+    // Format file size for display
+    // This function converts bytes to a more readable format (KB, MB, etc.)
     const formatFileSize = (bytes) => {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -101,6 +105,7 @@ const Upload = () => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
+    // Metadata fields configuration
     const metadataFields = [
         { name: 'title', label: 'Page Title', required: true },
         { name: 'description', label: 'Description', required: true, type: 'textarea' },

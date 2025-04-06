@@ -1,12 +1,25 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SearchBar from "../../components/searchBar/SearchBar";
 import "./styles.css";
 
 export default function Home() {
 
+    const [query, setQuery] = useState('');
+    const navigate = useNavigate();
+
+    const handleSearchSubmit = (searchValue) => {
+        navigate(`/search?query=${encodeURIComponent(searchValue)}`);
+    };
+
     return (
         <div id="outer-container">
             <div id="section-container">
-                <img id="main-image" alt="Internet Archive Logo" src="/ia-logo-2c2c2c.03bd7e88c8814d63d0fc..svg" />
+                <img
+                    id="main-image"
+                    alt="Internet Archive Logo"
+                    src="/ia-logo-2c2c2c.03bd7e88c8814d63d0fc..svg"
+                />
                 <h1 id="whoweare">
                     <strong>Internet Archive Replica</strong> is a student project
                     demonstrating Content and Multimedia Database Systems studying how to build a
@@ -14,7 +27,11 @@ export default function Home() {
                 </h1>
             </div>
             <div className="search-bar-container">
-                <SearchBar />
+                <SearchBar
+                    value={query}
+                    onChange={setQuery}
+                    onSubmit={handleSearchSubmit}
+                />
             </div>
         </div>
     );
