@@ -1,0 +1,217 @@
+import React, { useState, useCallback } from 'react';
+import axios from 'axios';
+import './styles.css';
+
+const initialMetadata = {
+    title: '',
+    url: '',
+    description: '',
+    subjects: [],
+    creator: '',
+    date: '',
+    collection: '',
+    testItem: false,
+    language: '',
+    license: ''
+};
+
+const Upload = () => {
+
+    const [file, setFile] = useState(null);
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+    const [metadata, setMetadata] = useState(initialMetadata);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setMetadata((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleUpload = async (e) => {
+        e.preventDefault();
+        if (!file) return setError('Please select a file to upload');
+
+        setIsLoading(true);
+        setError('');
+        setMessage('');
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('metadata', JSON.stringify(metadata));
+
+        try {
+            const res = await axios.post('http://localhost:5000/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setMessage(res.data.message);
+            setFile(null);
+            setMetadata(initialMetadata);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Error uploading file. Please try again.');
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDragEnter = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+    }, []);
+
+    const handleDragLeave = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    }, []);
+
+    const handleDragOver = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    }, []);
+
+    const handleDrop = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+
+        // Check if files are dropped
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            setFile(e.dataTransfer.files[0]);
+        }
+    }, []);
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFile(e.target.files[0]);
+        }
+    };
+
+    const formatFileSize = (bytes) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const metadataFields = [
+        { name: 'title', label: 'Page Title', required: true },
+        { name: 'description', label: 'Description', required: true, type: 'textarea' },
+        { name: 'subjects', label: 'Subject Tags (separated by commas)', required: true },
+        { name: 'creator', label: 'Creator' },
+        { name: 'date', label: 'Date', type: 'date' },
+        {
+            name: 'collection', label: 'Collection', type: 'select', options: [
+                'Community texts', 'Community movies', 'Community audio',
+                'Community software', 'Community image', 'Community data'
+            ]
+        },
+        {
+            name: 'language', label: 'Language', type: 'select', options: [
+                '', 'eng', 'fre',
+            ]
+        },
+        {
+            name: 'license', label: 'License', type: 'select', options: [
+                '', 'CC0', 'CC', 'PD'
+            ]
+        }
+    ];
+
+    return (
+        <div>
+            {/* Drag-and-drop area */}
+            {!file && (
+                <div
+                    id="file_drop"
+                    className={`drag_target ${isDragging ? 'drag-active' : ''}`}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                >
+                    <div id="file_drop_contents">
+                        <b>Drag &amp; Drop files here or</b>
+                        <button
+                            className="btn btn-archive"
+                            onClick={() => document.getElementById('file_input_initial').click()}
+                        >
+                            Choose files to upload
+                        </button>
+                        <input
+                            type="file"
+                            id="file_input_initial"
+                            className="hidden"
+                            onChange={handleFileChange}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* Metadata and upload button (only shown if a file is selected) */}
+            {file && (
+                <div id="file_info" className="table">
+                    <div id="metadata">
+                        {metadataFields.map((field) => (
+                            <div className="metadata_row" key={field.name}>
+                                <span className="mdata_key">
+                                    {field.label}{field.required && <span className="required_star">*</span>}
+                                </span>
+
+                                {field.type === 'textarea' ? (
+                                    <textarea
+                                        name={field.name}
+                                        value={metadata[field.name]}
+                                        onChange={handleChange}
+                                        placeholder={field.label}
+                                    />
+                                ) : field.type === 'select' ? (
+                                    <select
+                                        name={field.name}
+                                        value={metadata[field.name]}
+                                        onChange={handleChange}
+                                    >
+                                        {field.options.map(opt => (
+                                            <option key={opt} value={opt}>
+                                                {opt === '' ? 'Choose one...' : opt}
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <div className="mdata_value">
+                                        <input
+                                            name={field.name}
+                                            type={field.type || 'text'}
+                                            value={metadata[field.name]}
+                                            onChange={handleChange}
+                                            placeholder={field.prefix}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                        <br />
+                        <form onSubmit={handleUpload}>
+                            <button className="btn btn-submit" type="submit" disabled={isLoading}>
+                                {isLoading ? 'Uploading...' : 'Upload'}
+                            </button>
+                            <span className="file-size"><b>{formatFileSize(file.size)}</b></span>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {message && <div className="success-message">{message}</div>}
+            {error && <div className="error-message">{error}</div>}
+        </div>
+    );
+};
+
+export default Upload;
