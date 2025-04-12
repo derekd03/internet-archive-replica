@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './styles.css';
 
@@ -10,10 +11,11 @@ const initialMetadata = {
     creator: '',
     date: '',
     collection: '',
-    testItem: false,
     language: '',
     license: ''
 };
+
+const MAX_GB = 2147483648; // 2GB in bytes
 
 const Upload = () => {
 
@@ -34,7 +36,12 @@ const Upload = () => {
 
     const handleUpload = async (e) => {
         e.preventDefault();
+        // Validate required fields
         if (!file) return setError('Please select a file to upload');
+        if (!metadata.title.trim()) return setError('Title is required');
+        if (!metadata.description.trim()) return setError('Description is required');
+        if (!metadata.subjects.trim()) return setError('Subjects are required');
+        if (!metadata.collection) return setError('Please select a collection');
 
         setIsLoading(true);
         setError('');
@@ -43,14 +50,25 @@ const Upload = () => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('metadata', JSON.stringify(metadata));
+        formData.append('collection', metadata.collection); // Send collection separately
 
         try {
             const res = await axios.post('http://localhost:5000/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            setMessage(res.data.message);
+            if (res.data?.message) {
+                setMessage(res.data.message);
+            }
+
             setFile(null);
             setMetadata(initialMetadata);
+
+            const fileId = res.data?.fileId;
+            if (fileId) {
+                navigate(`/details/${fileId}`);
+            } else {
+                setError('File uploaded, but no file ID returned from server.');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Error uploading file. Please try again.');
             console.error(err);
@@ -91,7 +109,14 @@ const Upload = () => {
     // Handle file input change
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
-            setFile(e.target.files[0]);
+            const selectedFile = e.target.files[0];
+            if (selectedFile.size > MAX_GB) {
+                setError('File size exceeds the maximum limit of 2GB.');
+                setFile(null);
+            } else {
+                setFile(selectedFile);
+                setError('');
+            }
         }
     };
 
@@ -113,7 +138,7 @@ const Upload = () => {
         { name: 'creator', label: 'Creator' },
         { name: 'date', label: 'Date', type: 'date' },
         {
-            name: 'collection', label: 'Collection', type: 'select', options: [
+            name: 'collection', label: 'Collection', required: true, type: 'select', options: [
                 'Community texts', 'Community movies', 'Community audio',
                 'Community software', 'Community image', 'Community data'
             ]
@@ -132,89 +157,97 @@ const Upload = () => {
 
     return (
         <div>
-            {/* Drag-and-drop area */}
-            {!file && (
-                <div
-                    id="file_drop"
-                    className={`drag_target ${isDragging ? 'drag-active' : ''}`}
-                    onDragEnter={handleDragEnter}
-                    onDragLeave={handleDragLeave}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                >
-                    <div id="file_drop_contents">
-                        <b>Drag &amp; Drop files here or</b>
-                        <button
-                            className="btn btn-archive"
-                            onClick={() => document.getElementById('file_input_initial').click()}
+            {isLoading ? (
+                <div className="loading">
+                    <h2>Uploading...</h2>
+                    <p>Please wait while your file is being uploaded.</p>
+                </div>
+            ) : (
+                <>
+                    {/* Drag-and-drop area */}
+                    {!file && (
+                        <div
+                            id="file_drop"
+                            className={`drag_target ${isDragging ? 'drag-active' : ''}`}
+                            onDragEnter={handleDragEnter}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
                         >
-                            Choose files to upload
-                        </button>
-                        <input
-                            type="file"
-                            id="file_input_initial"
-                            className="hidden"
-                            onChange={handleFileChange}
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* Metadata and upload button (only shown if a file is selected) */}
-            {file && (
-                <div id="file_info" className="table">
-                    <div id="metadata">
-                        {metadataFields.map((field) => (
-                            <div className="metadata_row" key={field.name}>
-                                <span className="mdata_key">
-                                    {field.label}{field.required && <span className="required_star">*</span>}
-                                </span>
-
-                                {field.type === 'textarea' ? (
-                                    <textarea
-                                        name={field.name}
-                                        value={metadata[field.name]}
-                                        onChange={handleChange}
-                                        placeholder={field.label}
-                                    />
-                                ) : field.type === 'select' ? (
-                                    <select
-                                        name={field.name}
-                                        value={metadata[field.name]}
-                                        onChange={handleChange}
-                                    >
-                                        {field.options.map(opt => (
-                                            <option key={opt} value={opt}>
-                                                {opt === '' ? 'Choose one...' : opt}
-                                            </option>
-                                        ))}
-                                    </select>
-                                ) : (
-                                    <div className="mdata_value">
-                                        <input
-                                            name={field.name}
-                                            type={field.type || 'text'}
-                                            value={metadata[field.name]}
-                                            onChange={handleChange}
-                                            placeholder={field.prefix}
-                                        />
-                                    </div>
-                                )}
+                            <div id="file_drop_contents">
+                                <b>Drag &amp; Drop files here or</b>
+                                <button
+                                    className="btn btn-archive"
+                                    onClick={() => document.getElementById('file_input_initial').click()}
+                                >
+                                    Choose files to upload
+                                </button>
+                                <input
+                                    type="file"
+                                    id="file_input_initial"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                />
                             </div>
-                        ))}
-                        <br />
-                        <form onSubmit={handleUpload}>
-                            <button className="btn btn-submit" type="submit" disabled={isLoading}>
-                                {isLoading ? 'Uploading...' : 'Upload'}
-                            </button>
-                            <span className="file-size"><b>{formatFileSize(file.size)}</b></span>
-                        </form>
-                    </div>
-                </div>
-            )}
+                        </div>
+                    )}
+                    {/* Metadata and upload button (only shown if a file is selected) */}
+                    {file && (
+                        <div id="file_info" className="table">
+                            <div id="metadata">
+                                {metadataFields.map((field) => (
+                                    <div className="metadata_row" key={field.name}>
+                                        <span className="mdata_key">
+                                            {field.label}{field.required && <span className="required_star">*</span>}
+                                        </span>
 
-            {message && <div className="success-message">{message}</div>}
-            {error && <div className="error-message">{error}</div>}
+                                        {field.type === 'textarea' ? (
+                                            <textarea
+                                                name={field.name}
+                                                value={metadata[field.name]}
+                                                onChange={handleChange}
+                                                placeholder={field.label}
+                                            />
+                                        ) : field.type === 'select' ? (
+                                            <select
+                                                name={field.name}
+                                                value={metadata[field.name]}
+                                                onChange={handleChange}
+                                            >
+                                                {field.options.map(opt => (
+                                                    <option key={opt} value={opt}>
+                                                        {opt === '' ? 'Choose one...' : opt}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <div className="mdata_value">
+                                                <input
+                                                    name={field.name}
+                                                    type={field.type || 'text'}
+                                                    value={metadata[field.name]}
+                                                    onChange={handleChange}
+                                                    placeholder={field.prefix}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                <br />
+                                <form onSubmit={handleUpload}>
+                                    <button className="btn btn-submit" type="submit" disabled={isLoading}>
+                                        {isLoading ? 'Uploading...' : 'Upload'}
+                                    </button>
+                                    <span className="file-size"><b>{formatFileSize(file.size)}</b></span>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {message && <div className="success-message">{message}</div>}
+                    {error && <div className="error-message">{error}</div>}
+                </>
+            )}
         </div>
     );
 };

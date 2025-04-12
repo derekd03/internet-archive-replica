@@ -117,3 +117,6 @@ $RECYCLE.BIN/
 *.crt
 *.csr
 *references/
+
+# Uploaded files
+backend/uploads/
