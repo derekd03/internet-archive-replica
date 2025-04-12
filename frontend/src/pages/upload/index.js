@@ -142,7 +142,7 @@ const Upload = () => {
 
     // Metadata fields configuration
     const metadataFields = [
-        { name: 'title', label: 'Page Title', required: true },
+        { name: 'title', label: 'Title', required: true },
         { name: 'description', label: 'Description', required: true, type: 'textarea' },
         { name: 'subjects', label: 'Subject Tags (separated by commas)', required: true },
         { name: 'creator', label: 'Creator' },
@@ -155,7 +155,9 @@ const Upload = () => {
         },
         {
             name: 'language', label: 'Language', type: 'select', options: [
-                '', 'eng', 'fre',
+                { value: '', label: 'Choose one...' },
+                { value: 'eng', label: 'English' },
+                { value: 'fre', label: 'French' },
             ]
         },
         {
@@ -224,11 +226,17 @@ const Upload = () => {
                                                 value={metadata[field.name]}
                                                 onChange={handleChange}
                                             >
-                                                {field.options.map(opt => (
-                                                    <option key={opt} value={opt}>
-                                                        {opt === '' ? 'Choose one...' : opt}
-                                                    </option>
-                                                ))}
+                                                {field.options.map(opt =>
+                                                    typeof opt === 'string' ? (
+                                                        <option key={opt} value={opt}>
+                                                            {opt === '' ? 'Choose one...' : opt}
+                                                        </option>
+                                                    ) : (
+                                                        <option key={opt.value} value={opt.value}>
+                                                            {opt.label}
+                                                        </option>
+                                                    )
+                                                )}
                                             </select>
                                         ) : (
                                             <div className="mdata_value">

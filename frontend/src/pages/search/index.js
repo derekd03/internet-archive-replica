@@ -5,32 +5,12 @@ import './styles.css';
 import { useSearchParams } from "react-router-dom";
 
 const Search = () => {
+    
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const [query, setQuery] = useState(searchParams.get("query") || '');
     const navigate = useNavigate(); // Initialize useNavigate
-
-    const mockResults = [
-        {
-            id: 1,
-            title: 'The Great Gatsby',
-            year: '1925',
-            creator: 'F. Scott Fitzgerald',
-            collection: 'Book',
-            language: 'English',
-            imageUrl: 'https://archive.org/services/img/greatgatsby001gut',
-        },
-        {
-            id: 2,
-            title: 'Citizen Kane',
-            year: '1941',
-            creator: 'Orson Welles',
-            collection: 'Movie',
-            language: 'English',
-            imageUrl: 'https://archive.org/services/img/citizenkane',
-        }
-    ];
 
     // Debounce the query to delay search execution
     useEffect(() => {
@@ -39,22 +19,26 @@ const Search = () => {
                 setSearchParams({ query });
                 setIsLoading(true);
 
-                // Simulate an API call
-                setTimeout(() => {
-                    setResults(mockResults.filter(item =>
-                        item.title.toLowerCase().includes(query.toLowerCase()) ||
-                        item.creator.toLowerCase().includes(query.toLowerCase())
-                    ));
-                    setIsLoading(false);
-                }, 500);
+                fetch(`http://localhost:5000/search?query=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        setResults(data);
+                    })
+                    .catch(err => {
+                        console.error("Error fetching search results:", err);
+                        setResults([]);
+                    })
+                    .finally(() => {
+                        setIsLoading(false);
+                    });
             }
         }, 300);
 
         return () => clearTimeout(handler);
     }, [query, setSearchParams]);
 
-    const handleRowClick = (id) => {
-        navigate(`/details/${id}`); // Navigate to the details page
+    const handleRowClick = (item) => {
+        navigate(`/details/${item.id}`, { state: { item }}); // Navigate to the details page
     };
 
     return (
@@ -102,7 +86,7 @@ const Search = () => {
                         </thead>
                         <tbody>
                             {results.map(item => (
-                                <tr key={item.id} onClick={() => handleRowClick(item.id)} style={{ cursor: 'pointer' }}>
+                                <tr key={item.id} onClick={() => handleRowClick(item)} style={{ cursor: 'pointer' }}>
                                     <td><img src={item.imageUrl} alt={item.title} style={{ width: '60px' }} /></td>
                                     <td>{item.title}</td>
                                     <td>{item.creator}</td>

@@ -41,8 +41,15 @@ def upload():
     # Generate a unique file ID (UUID)
     file_id = str(uuid.uuid4())
     file_name = file.filename
-    file_path = os.path.join(collection_folder, file_name)
+
+    # Ensure the filename is unique within the collection (by UUID)
+    uuid_folder = os.path.join(collection_folder, file_id)
+    os.makedirs(uuid_folder, exist_ok=True)
+
+    # Save the file with the UUID as the folder name
+    file_path = os.path.join(uuid_folder, file.filename)
     file.save(file_path)
+
 
     # Insert metadata into the database
     try:
