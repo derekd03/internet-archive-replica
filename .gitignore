@@ -24,7 +24,6 @@ coverage.xml
 *.pot
 *.sqlite3
 *.db
-*.sql
 *.sql.gz
 
 # Node.js / React
@@ -84,7 +83,6 @@ $RECYCLE.BIN/
 
 # Logs and databases
 *.log
-*.sql
 *.sqlite
 *.db
 
