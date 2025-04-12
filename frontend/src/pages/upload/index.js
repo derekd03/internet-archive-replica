@@ -49,8 +49,18 @@ const Upload = () => {
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('metadata', JSON.stringify(metadata));
-        formData.append('collection', metadata.collection); // Send collection separately
+        formData.append('title', metadata.title);
+        formData.append('description', metadata.description);
+
+        // Ensure subjects is an array before calling join()
+        const subjects = Array.isArray(metadata.subjects) ? metadata.subjects : metadata.subjects.split(',');
+        formData.append('subjects', subjects.join(','));
+
+        formData.append('creator', metadata.creator);
+        formData.append('date', metadata.date);
+        formData.append('collection', metadata.collection);
+        formData.append('language', metadata.language);
+        formData.append('license', metadata.license);
 
         try {
             const res = await axios.post('http://localhost:5000/upload', formData, {
