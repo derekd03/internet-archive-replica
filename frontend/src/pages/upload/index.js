@@ -149,7 +149,7 @@ const Upload = () => {
         { name: 'date', label: 'Date', type: 'date' },
         {
             name: 'collection', label: 'Collection', required: true, type: 'select', options: [
-                'Community texts', 'Community movies', 'Community audio',
+                '', 'Community texts', 'Community movies', 'Community audio',
                 'Community software', 'Community image', 'Community data'
             ]
         },
