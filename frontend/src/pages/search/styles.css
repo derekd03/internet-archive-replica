@@ -1,8 +1,7 @@
 .archive-search {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 100%;
     padding: 40px 20px;
+    box-sizing: border-box;
 }
 
 .search-header {
@@ -38,6 +37,10 @@
     width: 100%;
     max-width: 1000px;
     margin-top: 20px;
+    max-height: 400px;
+    /* Limit height for scrolling */
+    overflow-y: auto;
+    /* Enable vertical scrolling if needed */
 }
 
 .results-table {

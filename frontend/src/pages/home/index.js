@@ -4,11 +4,11 @@ import SearchBar from "../../components/searchBar/SearchBar";
 import "./styles.css";
 
 export default function Home() {
-
     const [query, setQuery] = useState('');
     const navigate = useNavigate();
 
-    const handleSearchSubmit = (searchValue) => {
+    const handleSearch = (searchValue) => {
+        // Navigate to /search with query param
         navigate(`/search?query=${encodeURIComponent(searchValue)}`);
     };
 
@@ -30,7 +30,7 @@ export default function Home() {
                 <SearchBar
                     value={query}
                     onChange={setQuery}
-                    onSubmit={handleSearchSubmit}
+                    onSubmit={handleSearch}
                 />
             </div>
         </div>

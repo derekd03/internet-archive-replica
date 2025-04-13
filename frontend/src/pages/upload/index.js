@@ -19,6 +19,7 @@ const MAX_GB = 2147483648; // 2GB in bytes
 
 const Upload = () => {
 
+    const navigate = useNavigate();
     const [file, setFile] = useState(null);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
@@ -36,6 +37,7 @@ const Upload = () => {
 
     const handleUpload = async (e) => {
         e.preventDefault();
+
         // Validate required fields
         if (!file) return setError('Please select a file to upload');
         if (!metadata.title.trim()) return setError('Title is required');
@@ -44,15 +46,14 @@ const Upload = () => {
         if (!metadata.collection) return setError('Please select a collection');
 
         setIsLoading(true);
-        setError('');
-        setMessage('');
+        setError(''); // Clear any previous error
+        setMessage(''); // Clear any previous success message
 
         const formData = new FormData();
         formData.append('file', file);
         formData.append('title', metadata.title);
         formData.append('description', metadata.description);
 
-        // Ensure subjects is an array before calling join()
         const subjects = Array.isArray(metadata.subjects) ? metadata.subjects : metadata.subjects.split(',');
         formData.append('subjects', subjects.join(','));
 
@@ -66,22 +67,27 @@ const Upload = () => {
             const res = await axios.post('http://localhost:5000/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            if (res.data?.message) {
-                setMessage(res.data.message);
-            }
 
-            setFile(null);
-            setMetadata(initialMetadata);
+            console.log('Response:', res); // Debugging log
 
-            const fileId = res.data?.fileId;
-            if (fileId) {
-                navigate(`/details/${fileId}`);
+            if (res.status === 200) {
+                if (res.data?.file_id) {
+                    setMessage(res.data.message || 'Upload successful!');
+                    setError(''); // Clear any error
+                    navigate(`/details/${res.data.file_id}`);
+
+                } else {
+                    setMessage('Upload successful, but no file ID returned from server.');
+                    setError(''); // Clear any error
+                }
             } else {
-                setError('File uploaded, but no file ID returned from server.');
+                setMessage('');
+                setError('Unexpected response from server.');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Error uploading file. Please try again.');
-            console.error(err);
+            console.error('Upload error:', err); // Debugging log
+            setError(err.response?.data?.message);
+            setMessage(''); // Clear any success message
         } finally {
             setIsLoading(false);
         }
@@ -156,8 +162,7 @@ const Upload = () => {
         {
             name: 'language', label: 'Language', type: 'select', options: [
                 { value: '', label: 'Choose one...' },
-                { value: 'eng', label: 'English' },
-                { value: 'fre', label: 'French' },
+                'eng', 'fre'
             ]
         },
         {

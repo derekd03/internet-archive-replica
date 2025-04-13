@@ -1,17 +1,47 @@
-import React from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import "./styles.css";
 
 const Details = () => {
 
     const { id } = useParams();
-    const location = useLocation();
-    // Find the item with the matching ID
-    const item = location.state?.item;
+    const navigate = useNavigate();
 
-    if (!item) {
-        return <div>Item not found</div>;
-    }
+    const [item, setItem] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetch(`http://localhost:5000/item/${id}`)
+            .then((res) => res.json())
+            .then((data) => setItem(data))
+            .catch((err) => console.error('Failed to load item', err))
+            .finally(() => setLoading(false));
+    }, [id]);
+
+    const handleDelete = async () => {
+        const confirm = window.confirm("Are you sure you want to delete this item?");
+        if (!confirm) return;
+
+        try {
+            const response = await fetch(`http://localhost:5000/delete/${item.id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert("Item deleted successfully");
+                navigate('/');
+            } else {
+                const data = await response.json();
+                alert("Failed to delete item: " + data.message);
+            }
+        } catch (error) {
+            alert("Error deleting item: " + error.message);
+        }
+    };
+
+    if (loading) return <div>Loading...</div>;
+    if (error || !item) return <div>Error: {error || "Item not found"}</div>;
 
     const downloadUrl = item.id
         ? `http://localhost:5000/download/${item.id}`
@@ -20,11 +50,9 @@ const Details = () => {
     return (
         <div className="details-container">
             <div className="item-header">
-                <img src={item.imageUrl} alt={item.title} style={{ maxWidth: '300px' }} />
-                <div>
+                <div className="item-info">
                     <h1>{item.title}</h1>
                     <h2>{item.creator}</h2>
-                    <p>{item.year} • {item.collection}</p>
                     {downloadUrl && (
                         <a
                             href={downloadUrl}
@@ -36,20 +64,41 @@ const Details = () => {
                             Download
                         </a>
                     )}
+                    <button
+                        onClick={handleDelete}
+                        className="delete-button"
+                    >
+                        Delete
+                    </button>
+                    <button
+                        onClick={() => navigate(`/edit/${item.id}`, { state: { item } })}
+                        className="edit-button"
+                    >
+                        Edit
+                    </button>
                 </div>
             </div>
 
             <div className="item-details">
-                <p>{item.description || "No description available"}</p>
-
                 <div className="details-grid">
                     <div>
+                        <h3>Description</h3>
+                        <p>{item.description || "No description available"}</p>
+                    </div>
+                    <div>
+                        <h3>Collection</h3>
+                        <p className="item-meta">
+                            {/* Format collection name */}
+                            {item.collection.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}
+                        </p>
+                    </div>
+                    <div>
                         <h3>Date</h3>
-                        <p>{item.date}</p>
+                        <p>{item.date || "No date listed"}</p>
                     </div>
                     <div>
                         <h3>Subjects</h3>
-                        <p>{item.subjects.join(', ')}</p>
+                        <p>{Array.isArray(item.subjects) ? item.subjects.join(', ') : "No subjects listed"}</p>
                     </div>
                     <div>
                         <h3>Language</h3>

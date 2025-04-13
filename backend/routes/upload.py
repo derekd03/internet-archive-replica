@@ -2,10 +2,9 @@ import os
 import uuid
 from flask import Blueprint, request, jsonify
 from db import get_db_connection  # Import from db.py
+from config import UPLOAD_FOLDER
 
 upload_bp = Blueprint('upload', __name__)
-
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 
 @upload_bp.route('/upload', methods=['POST'])
 def upload():
@@ -28,9 +27,11 @@ def upload():
         'license': request.form.get('license'),
     }
 
-    # Validate metadata
-    if not all(metadata.values()):
-        return jsonify({'message': 'All fields are required'}), 400
+    # Validate required fields
+    required_fields = ['title', 'description', 'subjects', 'collection']
+    missing_fields = [field for field in required_fields if not metadata.get(field)]
+    if missing_fields:
+        return jsonify({'message': f'Missing required fields: {", ".join(missing_fields)}'}), 400
 
     # Sanitize collection name
     collection = metadata['collection'].replace(" ", "_").lower()
@@ -50,24 +51,32 @@ def upload():
     file_path = os.path.join(uuid_folder, file.filename)
     file.save(file_path)
 
+    # Convert subjects list to comma-separated string
+    subjects_str = ','.join(metadata['subjects'])
 
     # Insert metadata into the database
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # Convert subjects list into a PostgreSQL array (using curly braces)
+        subjects_array = '{' + ','.join(metadata['subjects']) + '}'
+
         cursor.execute(
             """
             INSERT INTO files (id, filename, filepath, title, description, subjects, creator, upload_date, collection, language, license)
             VALUES (%s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP, %s, %s, %s)
             """,
-            (file_id, file_name, file_path, metadata['title'], metadata['description'], metadata['subjects'],
-             metadata['creator'], collection, metadata['language'], metadata['license'])
+            (file_id, file_name, file_path, metadata['title'], metadata['description'],
+            subjects_array, metadata['creator'], collection, metadata['language'], metadata['license'])
         )
         conn.commit()
     except Exception as e:
+        print(f"Error during upload: {e}")  # Log to console
         return jsonify({'message': f'Error saving metadata: {e}'}), 500
     finally:
         cursor.close()
+        conn.close()
 
     return jsonify({
         'message': 'File uploaded successfully',

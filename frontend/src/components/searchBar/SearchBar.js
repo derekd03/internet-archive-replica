@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import './SearchBar.css';
 
 export default function SearchBar({ value, onChange, onSubmit }) {
-
     const [internalQuery, setInternalQuery] = useState('');
     const navigate = useNavigate();
 
     const isControlled = typeof value !== 'undefined';
 
     const handleInputChange = (event) => {
-        // Check if the component is controlled or uncontrolled
-        // If controlled, use the value from props; otherwise, use internal state
         const newValue = event.target.value;
         if (isControlled) {
             onChange(newValue);
@@ -30,8 +27,8 @@ export default function SearchBar({ value, onChange, onSubmit }) {
         }
 
         if (onSubmit) {
-            onSubmit(searchValue);
-        } else { // Default behavior: navigate to search results page
+            onSubmit(searchValue); // Trigger the handleSearch function passed down as prop
+        } else {
             navigate(`/search?query=${encodeURIComponent(searchValue)}`);
         }
     };
