@@ -1,5 +1,6 @@
 import os
 import shutil
+import bleach
 from flask import Blueprint, request, jsonify
 from db import get_db_connection
 
@@ -12,14 +13,13 @@ def edit_file(file_id):
 
     # Extract metadata
     metadata = {
-        'title': data.get('title'),
-        'description': data.get('description'),
-        'subjects': data.get('subjects'),
-        'creator': data.get('creator'),
-        'metadata_date': data.get('date') or None,
-        'collection': data.get('collection'),
-        'language': data.get('language'),
-        'license': data.get('license'),
+        'title': bleach.clean(data.get('title')),
+        'description': bleach.clean(data.get('description')),
+        'subjects': [bleach.clean(subject) for subject in data.get('subjects', [])],
+        'creator': bleach.clean(data.get('creator')),
+        'collection': bleach.clean(data.get('collection')),
+        'language': bleach.clean(data.get('language')),
+        'license': bleach.clean(data.get('license')),
     }
 
     # Validate required fields
@@ -59,13 +59,13 @@ def edit_file(file_id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        # Update metadata using parameterized query
         cursor.execute("""
             UPDATE files
             SET title = %s,
                 description = %s,
                 subjects = %s,
                 creator = %s,
-                metadata_date = %s,
                 collection = %s,
                 language = %s,
                 license = %s
@@ -75,7 +75,6 @@ def edit_file(file_id):
             metadata['description'],
             metadata['subjects'],
             metadata['creator'],
-            metadata['metadata_date'],
             new_collection,
             metadata['language'],
             metadata['license'],

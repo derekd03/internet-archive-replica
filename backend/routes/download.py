@@ -1,4 +1,5 @@
 import os
+import bleach
 from flask import Blueprint, jsonify, send_file
 from db import get_db_connection  # Import from db.py
 
@@ -6,6 +7,7 @@ download_bp = Blueprint('download', __name__)
 
 @download_bp.route('/download/<uuid:file_id>', methods=['GET'])
 def download(file_id):
+    
     conn = get_db_connection()
     cursor = conn.cursor()
 

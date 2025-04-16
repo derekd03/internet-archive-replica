@@ -5,10 +5,29 @@
 }
 
 .search-header {
-    width: 100%;
-    max-width: 800px;
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
 }
+
+.search-bar-container {
+    width: 100%;
+    max-width: 600px;
+    min-height: 60px;
+    /* Ensures height stays stable */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* If needed, also style the SearchBar input */
+.search-bar-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+}
+
 
 .search-box {
     display: flex;
@@ -38,9 +57,7 @@
     max-width: 1000px;
     margin-top: 20px;
     max-height: 400px;
-    /* Limit height for scrolling */
     overflow-y: auto;
-    /* Enable vertical scrolling if needed */
 }
 
 .results-table {
@@ -89,9 +106,7 @@
 
 .results-table tbody tr:hover {
     background-color: #e0e0e0;
-    /* Light gray background on hover */
     transition: background-color 0.2s ease;
-    /* Smooth transition effect */
 }
 
 .loading,
@@ -103,4 +118,75 @@
 
 .no-results {
     color: #666;
+}
+
+.pagination {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.page-btn {
+    padding: 0.8rem 1.2rem;
+    margin: 0 0.4rem;
+    font-size: 1.4rem;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.page-btn.active {
+    background-color: #428bca;
+    color: #fff;
+    border-color: #357ebd;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* Create 4 equal columns */
+    grid-auto-rows: auto;
+    /* Automatically adjust row height */
+    gap: 20px;
+    /* Maintain spacing between cards */
+    margin-top: 20px;
+}
+
+.result-card {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.result-card:hover {
+    text-decoration: underline;
+}
+
+.result-card h3 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.result-card p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+@media (max-width: 1024px) {
+    .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 columns for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 columns for smaller screens */
+    }
 }

@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 import './styles.css';
 
 const initialMetadata = {
@@ -9,13 +10,12 @@ const initialMetadata = {
     description: '',
     subjects: [],
     creator: '',
-    date: '',
     collection: '',
     language: '',
     license: ''
 };
 
-const MAX_GB = 2147483648; // 2GB in bytes
+const MAX_GB = 2 * 1024 * 1024 * 1024; // 2GB in bytes
 
 const Upload = () => {
 
@@ -58,7 +58,6 @@ const Upload = () => {
         formData.append('subjects', subjects.join(','));
 
         formData.append('creator', metadata.creator);
-        formData.append('date', metadata.date);
         formData.append('collection', metadata.collection);
         formData.append('language', metadata.language);
         formData.append('license', metadata.license);
@@ -67,8 +66,6 @@ const Upload = () => {
             const res = await axios.post('http://localhost:5000/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-
-            console.log('Response:', res); // Debugging log
 
             if (res.status === 200) {
                 if (res.data?.file_id) {
@@ -152,7 +149,6 @@ const Upload = () => {
         { name: 'description', label: 'Description', required: true, type: 'textarea' },
         { name: 'subjects', label: 'Subject Tags (separated by commas)', required: true },
         { name: 'creator', label: 'Creator' },
-        { name: 'date', label: 'Date', type: 'date' },
         {
             name: 'collection', label: 'Collection', required: true, type: 'select', options: [
                 '', 'Community texts', 'Community movies', 'Community audio',
@@ -267,8 +263,8 @@ const Upload = () => {
                         </div>
                     )}
 
-                    {message && <div className="success-message">{message}</div>}
-                    {error && <div className="error-message">{error}</div>}
+                    {message && <div className="success-message">{DOMPurify.sanitize(message)}</div>}
+                    {error && <div className="error-message">{DOMPurify.sanitize(error)}</div>}
                 </>
             )}
         </div>

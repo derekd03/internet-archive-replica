@@ -1,4 +1,3 @@
-/* Reset & Base Styles */
 *,
 *:before,
 *:after {
@@ -16,7 +15,6 @@ body {
     -ms-text-size-adjust: 100%;
 }
 
-/* Typography */
 .gray {
     color: #555;
     font-weight: 500;
@@ -27,7 +25,6 @@ body {
     display: none;
 }
 
-/* Buttons */
 .btn {
     display: inline-block;
     margin-bottom: 0;
@@ -62,7 +59,6 @@ body {
     border-color: #286090;
 }
 
-/* Drag & Drop */
 .drag_target {
     display: flex;
     align-items: center;
@@ -92,7 +88,6 @@ body {
     font-size: 0.75em;
 }
 
-/* Tables */
 .table,
 #file_table {
     width: 100%;
@@ -137,7 +132,6 @@ body {
     margin-bottom: 1rem;
 }
 
-/* File Info */
 #file_info {
     margin: 40rem auto 8rem auto;
     padding: 2rem;
@@ -147,7 +141,6 @@ body {
     border-radius: 0.5rem;
 }
 
-/* Metadata Form */
 #metadata {
     margin: 4rem 4rem 4rem 4rem;
 }
@@ -187,11 +180,10 @@ body {
 }
 
 .metadata_row textarea {
-    resize: vertical;
+    resize: none;
     min-height: 10rem;
 }
 
-/* Metadata Value */
 .mdata_value {
     display: flex;
     align-items: center;
@@ -206,7 +198,6 @@ body {
     margin-right: 0.8rem;
 }
 
-/* File Size Indicator */
 form>span>b,
 .file-size {
     font-size: 1.6rem;
@@ -214,7 +205,6 @@ form>span>b,
     vertical-align: middle;
 }
 
-/* Checkmarks */
 .checkmark {
     display: inline-block;
     width: 1.5rem;

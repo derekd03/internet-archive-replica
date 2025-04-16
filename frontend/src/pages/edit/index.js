@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 import './styles.css';
 
 const Edit = () => {
@@ -14,7 +15,6 @@ const Edit = () => {
         description: item?.description || '',
         subjects: item?.subjects || [],
         creator: item?.creator || '',
-        date: item?.date || '',
         collection: item?.collection || '',
         language: item?.language || '',
         license: item?.license || ''
@@ -29,13 +29,6 @@ const Edit = () => {
         { name: 'description', label: 'Description', required: true, type: 'textarea' },
         { name: 'subjects', label: 'Subject Tags (separated by commas)', required: true },
         { name: 'creator', label: 'Creator' },
-        { name: 'date', label: 'Date', type: 'date' },
-        {
-            name: 'collection', label: 'Collection', required: true, type: 'select', options: [
-                '', 'Community texts', 'Community movies', 'Community audio',
-                'Community software', 'Community image', 'Community data'
-            ]
-        },
         {
             name: 'language', label: 'Language', type: 'select', options: [
                 { value: '', label: 'Choose one...' },
@@ -56,21 +49,36 @@ const Edit = () => {
 
     useEffect(() => {
         if (!item) {
-            setError('Item not found');
-            return;
+            // Fetch item data from the server
+            axios.get(`http://localhost:5000/item/${id}`)
+                .then((res) => {
+                    const fetchedItem = res.data;
+                    setMetadata({
+                        title: fetchedItem.title || '',
+                        description: fetchedItem.description || '',
+                        subjects: fetchedItem.subjects || [],
+                        creator: fetchedItem.creator || '',
+                        collection: fetchedItem.collection || '',
+                        language: fetchedItem.language || '',
+                        license: fetchedItem.license || ''
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    setError('Failed to fetch item metadata.');
+                });
+        } else {
+            setMetadata({
+                title: item.title || '',
+                description: item.description || '',
+                subjects: item.subjects || [],
+                creator: item.creator || '',
+                collection: item.collection || '',
+                language: item.language || '',
+                license: item.license || ''
+            });
         }
-
-        setMetadata({
-            title: item.title || '',
-            description: item.description || '',
-            subjects: item.subjects || [],
-            creator: item.creator || '',
-            date: item.date || '',
-            collection: item.collection || '',
-            language: item.language || '',
-            license: item.license || ''
-        });
-    }, [item]);
+    }, [item, id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -164,8 +172,8 @@ const Edit = () => {
                     <button className="btn btn-submit" type="submit" disabled={isLoading}>
                         {isLoading ? 'Saving...' : 'Save'}
                     </button>
-                    {error && <div className="error-message">{error}</div>}
-                    {message && <div className="success-message">{message}</div>}
+                    {error && <div className="error-message">{DOMPurify.sanitize(error)}</div>}
+                    {message && <div className="success-message">{DOMPurify.sanitize(message)}</div>}
                 </form>
             </div>
         </div>

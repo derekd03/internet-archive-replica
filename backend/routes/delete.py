@@ -2,6 +2,7 @@ import os
 import uuid
 from flask import Blueprint, request, jsonify
 from db import get_db_connection  # Import from db.py
+import bleach
 
 delete_bp = Blueprint('delete', __name__)
 
@@ -9,6 +10,15 @@ delete_bp = Blueprint('delete', __name__)
 def delete_file(file_id):
     if not file_id:
         return jsonify({"error": "File ID is required"}), 400
+
+    # Sanitize file_id
+    file_id = bleach.clean(file_id)
+
+    # Validate file_id as a UUID
+    try:
+        uuid.UUID(file_id)
+    except ValueError:
+        return jsonify({"error": "Invalid File ID format"}), 400
 
     conn = get_db_connection()
     cursor = conn.cursor()

@@ -12,6 +12,11 @@
     z-index: 1000;
 }
 
+/* Add padding to the body to prevent content overlap */
+body {
+    margin: 0;
+}
+
 .header-nav {
     display: flex;
     justify-content: space-between;
