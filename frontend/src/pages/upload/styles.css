@@ -15,12 +15,6 @@ body {
     -ms-text-size-adjust: 100%;
 }
 
-.gray {
-    color: #555;
-    font-weight: 500;
-    font-size: 1.6rem;
-}
-
 .hidden {
     display: none;
 }

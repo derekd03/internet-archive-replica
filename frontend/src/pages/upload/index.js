@@ -200,6 +200,7 @@ const Upload = () => {
                                 >
                                     Choose files to upload
                                 </button>
+                                <b>(Max 2GB)</b>
                                 <input
                                     type="file"
                                     id="file_input_initial"

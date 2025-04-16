@@ -16,13 +16,6 @@
     align-items: flex-start;
 }
 
-.item-image {
-    max-width: 240px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
 .item-info {
     flex: 1;
     min-width: 0;

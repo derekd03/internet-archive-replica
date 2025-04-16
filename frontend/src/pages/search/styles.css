@@ -60,55 +60,6 @@
     overflow-y: auto;
 }
 
-.results-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
-    table-layout: fixed;
-}
-
-.results-table th,
-.results-table td {
-    border: 1px solid #ccc;
-    padding: 12px;
-    text-align: left;
-    word-wrap: break-word;
-    vertical-align: top;
-}
-
-.results-table th {
-    background-color: #f4f4f4;
-    position: sticky;
-    top: 0;
-}
-
-.results-table th:nth-child(1),
-.results-table td:nth-child(1) {
-    width: 250px;
-}
-
-.results-table th:nth-child(2),
-.results-table td:nth-child(2) {
-    width: 200px;
-}
-
-.results-table th:nth-child(3),
-.results-table td:nth-child(3) {
-    width: 80px;
-}
-
-.results-table th:nth-child(4),
-.results-table td:nth-child(4),
-.results-table th:nth-child(5),
-.results-table td:nth-child(5) {
-    width: 100px;
-}
-
-.results-table tbody tr:hover {
-    background-color: #e0e0e0;
-    transition: background-color 0.2s ease;
-}
-
 .loading,
 .no-results {
     text-align: center;
