@@ -14,7 +14,7 @@ def search():
 
     # Pagination parameters
     page = int(request.args.get('page', 1))
-    page_size = 1  # Number of results per page
+    page_size = 16  # Number of results per page
     offset = (page - 1) * page_size
 
     # Validate query parameter

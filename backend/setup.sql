@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.files
     file_size bigint, -- Add file_size column to store file size in bytes
     CONSTRAINT files_pkey PRIMARY KEY (id),
     CONSTRAINT files_license_check CHECK (license = ANY (ARRAY[''::text, 'CC0'::text, 'CC'::text, 'PD'::text])),
-    CONSTRAINT files_collection_check CHECK (collection = ANY (ARRAY['community_texts'::text, 'community_movies'::text, 'community_audio'::text, 'community_software'::text, 'community_image'::text, 'community_data'::text]))
+    CONSTRAINT files_collection_check CHECK (collection = ANY (ARRAY['community_texts'::text, 'community_video'::text, 'community_audio'::text, 'community_software'::text, 'community_images'::text, 'community_data'::text]))
 )
 
 TABLESPACE pg_default;

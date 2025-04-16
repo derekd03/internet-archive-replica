@@ -46,7 +46,7 @@ export default function Home() {
                 <a
                     className="media-type"
                     title="Videos"
-                    onClick={() => handleSearch("community videos")}
+                    onClick={() => handleSearch("community video")}
                 >
                     <div className="media-icon">
                         <img

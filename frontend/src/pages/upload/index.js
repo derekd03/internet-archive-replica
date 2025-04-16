@@ -156,8 +156,8 @@ const Upload = () => {
         { name: 'creator', label: 'Creator' },
         {
             name: 'collection', label: 'Collection', required: true, type: 'select', options: [
-                '', 'Community texts', 'Community movies', 'Community audio',
-                'Community software', 'Community image', 'Community data'
+                '', 'Community texts', 'Community video', 'Community audio',
+                'Community software', 'Community images', 'Community data'
             ]
         },
         {
