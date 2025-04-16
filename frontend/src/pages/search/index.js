@@ -4,6 +4,7 @@ import SearchBar from '../../components/searchBar/SearchBar';
 import './styles.css';
 import { useSearchParams, useLocation } from "react-router-dom";
 import DOMPurify from 'dompurify';
+import { formatCollectionName } from '../../utils/formatCollectionName';
 
 const Search = () => {
     const [results, setResults] = useState([]);
@@ -53,13 +54,6 @@ const Search = () => {
 
     const handleRowClick = (item) => {
         navigate(`/details/${item.id}`, { state: { item } });
-    };
-
-    const formatCollectionName = (name) => {
-        if (!name) return "N/A";
-        return name
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, c => c.toUpperCase());
     };
 
     useEffect(() => {

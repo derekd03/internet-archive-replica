@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DOMPurify from 'dompurify';
 import './styles.css';
+import { formatFileSize } from '../../utils/fileHelpers';
 
 const initialMetadata = {
     title: '',
@@ -145,16 +146,6 @@ const Upload = () => {
                 setError('');
             }
         }
-    };
-
-    // Format file size for display
-    // This function converts bytes to a more readable format (KB, MB, etc.)
-    const formatFileSize = (bytes) => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
     // Metadata fields configuration

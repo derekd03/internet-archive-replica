@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
+import { formatCollectionName } from '../../utils/formatCollectionName';
 import "./styles.css";
 
 const Details = () => {
@@ -83,8 +84,7 @@ const Details = () => {
                         <div>
                             <h3>Collection</h3>
                             <p className="item-meta">
-                                {/* Format collection name */}
-                                {item.collection.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}
+                                {formatCollectionName(item.collection)}
                             </p>
                         </div>
                         <div>
