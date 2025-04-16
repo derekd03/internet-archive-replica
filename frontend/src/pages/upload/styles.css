@@ -187,7 +187,18 @@ body {
 }
 
 .metadata_row textarea {
-    resize: vertical;
+    resize: none;
+    /* Disable resizing */
+    min-height: 10rem;
+    /* Optional: Set a fixed height */
+    width: 100%;
+    /* Ensure it takes up the full width of its container */
+    box-sizing: border-box;
+    /* Include padding and border in the width */
+}
+
+textarea {
+    resize: none;
     min-height: 10rem;
 }
 

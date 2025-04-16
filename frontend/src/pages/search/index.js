@@ -63,7 +63,6 @@ const Search = () => {
                     <table className="results-table">
                         <thead>
                             <tr>
-                                <th>Image</th>
                                 <th>Title</th>
                                 <th>Creator</th>
                                 <th>Year</th>
@@ -74,11 +73,11 @@ const Search = () => {
                         <tbody>
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan="6" className="placeholder">Loading...</td>
+                                    <td colSpan="5" className="placeholder">Loading...</td>
                                 </tr>
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="placeholder">No results found</td>
+                                    <td colSpan="5" className="placeholder">No results found</td>
                                 </tr>
                             )}
                         </tbody>
@@ -87,7 +86,6 @@ const Search = () => {
                     <table className="results-table">
                         <thead>
                             <tr>
-                                <th>Image</th>
                                 <th>Title</th>
                                 <th>Creator</th>
                                 <th>Year</th>
@@ -98,10 +96,9 @@ const Search = () => {
                         <tbody>
                             {results.map(item => (
                                 <tr key={item.id} onClick={() => handleRowClick(item)} style={{ cursor: 'pointer' }}>
-                                    <td><img src="/default.png" alt={"No preview"} style={{ width: '60px' }} /></td>
                                     <td>{item.title}</td>
                                     <td>{item.creator}</td>
-                                    <td>{item.year}</td>
+                                    <td>{new Date(item.metadata_date).getFullYear()}</td>
                                     <td>{formatCollectionName(item.collection)}</td>
                                     <td>{item.language}</td>
                                 </tr>

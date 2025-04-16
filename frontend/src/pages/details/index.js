@@ -93,8 +93,12 @@ const Details = () => {
                         </p>
                     </div>
                     <div>
-                        <h3>Date</h3>
-                        <p>{item.date || "No date listed"}</p>
+                        <h3>Upload Date</h3>
+                        <p>{item.upload_date ? new Date(item.upload_date).toLocaleDateString() : "No date listed"}</p>
+                    </div>
+                    <div>
+                        <h3>Release Date</h3>
+                        <p>{item.metadata_date ? new Date(item.metadata_date).toLocaleDateString() : "No date listed"}</p>
                     </div>
                     <div>
                         <h3>Subjects</h3>

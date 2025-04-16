@@ -14,7 +14,20 @@
 
 .header-nav {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
     gap: 20px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
 }
 
 .nav-link {
@@ -22,8 +35,26 @@
     text-decoration: none;
     font-weight: 500;
     font-size: 16px;
+    display: flex;
+    align-items: center;
 }
 
-.nav-link:hover {
-    text-decoration: underline;
+.nav-link img {
+    filter: brightness(0) invert(1);
+    padding: 8px;
+}
+
+.upload {
+    display: flex;
+    align-items: center;
+    color: #999;
+}
+
+.upload:hover .upload-icon {
+    fill: white;
+}
+
+.upload-icon {
+    fill: #999;
+    transition: fill 0.2s ease;
 }
