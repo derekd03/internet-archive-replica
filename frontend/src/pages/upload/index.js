@@ -45,6 +45,11 @@ const Upload = () => {
         if (!metadata.subjects.trim()) return setError('Subjects are required');
         if (!metadata.collection) return setError('Please select a collection');
 
+        if (file && file.size > MAX_GB) {
+            setError('File size exceeds the maximum limit of 2GB.');
+            return;
+        }
+
         setIsLoading(true);
         setError(''); // Clear any previous error
         setMessage(''); // Clear any previous success message
@@ -115,7 +120,16 @@ const Upload = () => {
 
         // Check if files are dropped
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            setFile(e.dataTransfer.files[0]);
+            const droppedFile = e.dataTransfer.files[0];
+
+            // Validate file size
+            if (droppedFile.size > MAX_GB) {
+                setError('File size exceeds the maximum limit of 2GB.');
+                setFile(null); // Clear any previously selected file
+            } else {
+                setFile(droppedFile);
+                setError(''); // Clear any previous error
+            }
         }
     }, []);
 
@@ -264,7 +278,7 @@ const Upload = () => {
                     )}
 
                     {message && <div className="success-message">{DOMPurify.sanitize(message)}</div>}
-                    {error && <div className="error-message">{DOMPurify.sanitize(error)}</div>}
+                    {error && <p className="error-text">{error}</p>}
                 </>
             )}
         </div>

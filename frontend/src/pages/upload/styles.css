@@ -226,3 +226,12 @@ form>span>b,
 .check_gray {
     background-color: #ccc;
 }
+
+.error-text {
+    color: red;
+    font-size: 1.8rem;
+    /* Increased font size for better readability */
+    font-weight: bold;
+    margin-top: 1rem;
+    text-align: center;
+}
